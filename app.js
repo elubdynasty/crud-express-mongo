@@ -16,20 +16,34 @@ MongoClient.connect(uri, {
 
   const favsCollection = db.collection("users");
 
+  app.set("view engine", "ejs");
+ 
+
   //middleware
   app.use(express.json());
 
   // For parsing application/x-www-form-urlencoded
   app.use(express.urlencoded({ extended: true }));
 
-  app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html");
-  });
+   app.get("/", (req, res) => {
+     favsCollection.find().toArray()
+     .then(results => {
+        //console.log(results)
+        res.render("index.ejs", { users: results });
+     })
+     .catch(err => {
+         console.error(err)
+     })
+   
+
+   });
 
   app.post("/create-users", (req, res) => {
     //console.log(req.body)
     favsCollection.insertOne(req.body).then((result) => {
-      console.log(result);
+      //console.log(result);
+      
+      res.redirect("/"); //when don't need to send browser info by asking the it to redirect back to '/' instead
     });
   });
 
